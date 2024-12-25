@@ -1,48 +1,54 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
-
-// Import the WebAssembly and JS files
 import WebAssemblyBinary from './wasm/bubble_sort.wasm';
 
-function App() {
-  const [numbers, setNumbers] = useState({
-    a: 0,
-    b: 0,
+const loadWasm = async () => {
+  const wasmModule = await WebAssembly.instantiateStreaming(fetch(WebAssemblyBinary), {
+    env: {
+      memory: new WebAssembly.Memory({ initial: 256, maximum: 256 }),
+    },
   });
-  const [result, setResult] = useState(0);
+  console.log(wasmModule.instance.exports);
+  return wasmModule.instance.exports;
+};
 
-  // Load WebAssembly
-  const loadWasm = async () => {
-    const wasmModule = await WebAssembly.instantiateStreaming(fetch(WebAssemblyBinary), {
-      env: {
-        // You can add imports if needed
-      }
-    });
-    return wasmModule.instance.exports;
-  };
+export default function App() {
+  const [array, setArray] = useState([6, 8, 9, 1, 3, 7]);
+  const [steps, setSteps] = useState([]);
 
-  const handleClick = async () => {
+  const handleSorting = async () => {
     const wasmCore = await loadWasm();
+    const wasmMemory = new Int32Array(wasmCore.memory.buffer);
+    const arraySize = array.length;
+    const wasmArrayPtr = 100;
 
-    // Ensure numbers are converted to integers
-    const res = wasmCore.adder(Number(numbers.a), Number(numbers.b));
-    setResult(res);
+    for (let i = 0; i < arraySize; i++) {
+      wasmMemory[wasmArrayPtr / 4 + i] = array[i];
+    }
+
+    const callback = (arrPtr, size) => {
+      const currentArray = [];
+
+      for (let i = 0; i < size; i++) {
+        currentArray.push(wasmMemory[arrPtr / 4 + i]);
+      }
+
+      setSteps((prevSteps) => [...prevSteps, currentArray]);
+    };
+
+    wasmCore.buffer(wasmArrayPtr, arraySize, callback);
   };
 
   return (
-    <div className="App">
-      <input
-        type="text"
-        onChange={(e) => setNumbers({ ...numbers, a: e.target.value })}
-      />
-      <input
-        type="text"
-        onChange={(e) => setNumbers({ ...numbers, b: e.target.value })}
-      />
-      <button onClick={handleClick}>Add</button>
-      <div className="bg-red-300">{result}</div>
-    </div>
+    <main className='p-5 flex flex-col items-center'>
+      <h1 className='text-3xl py-5'>Bubble Sort</h1>
+      <button
+        className='bg-purple-600 text-neutral-100 px-4 py-1 rounded-md'
+        onClick={handleSorting}
+      >
+        Sort Array
+      </button>
+      <div className='py-5'>{array.join(", ")}</div>
+    </main>
   );
 }
-
-export default App;
