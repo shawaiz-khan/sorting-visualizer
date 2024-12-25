@@ -1,0 +1,22 @@
+{
+    "env": {
+        "browser": true,
+        "node": true,
+        "es2021": true
+    },
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "globals": {
+        "globalThis": "readonly",
+        "self": "readonly"
+    },
+    "rules": {
+        "no-restricted-globals": [
+            "error",
+            "event",
+            "fdescribe"
+        ],
+        "no-undef": "off"
+    }
+}
