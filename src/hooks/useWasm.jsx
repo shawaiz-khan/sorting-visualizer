@@ -22,7 +22,7 @@ export default function useWasm() {
                     },
                     emscripten_resize_heap: (requestedSize) => {
                         console.warn(`Heap resize requested: ${requestedSize}. Not implemented.`);
-                        return false; // Mock implementation
+                        return false;
                     },
                 },
             });
