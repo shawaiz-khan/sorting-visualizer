@@ -8,10 +8,22 @@ export default function useWasm() {
 
     const loadWasm = async () => {
         try {
+            const memory = new WebAssembly.Memory({ initial: 256, maximum: 256 });
             const res = await WebAssembly.instantiateStreaming(fetch(WebAssemblyBinary), {
                 env: {
-                    emscripten_asm_const_int: () => 0,
-                    emscripten_resize_heap: () => true,
+                    memory,
+                    table: new WebAssembly.Table({ initial: 0, element: 'anyfunc' }),
+                    __memory_base: 0,
+                    __table_base: 0,
+                    _emscripten_memcpy_js: (dest, src, num) => {
+                        const memoryBuffer = new Uint8Array(memory.buffer);
+                        memoryBuffer.set(memoryBuffer.subarray(src, src + num), dest);
+                        return dest;
+                    },
+                    emscripten_resize_heap: (requestedSize) => {
+                        console.warn(`Heap resize requested: ${requestedSize}. Not implemented.`);
+                        return false; // Mock implementation
+                    },
                 },
             });
             setWasmModule(res.instance.exports);

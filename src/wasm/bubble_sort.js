@@ -28,7 +28,7 @@ var readyPromise = new Promise((resolve, reject) => {
   readyPromiseResolve = resolve;
   readyPromiseReject = reject;
 });
-["_free","_malloc","_bubbleSort","_memory","_setCallback","___indirect_function_table","_testFunction","onRuntimeInitialized"].forEach((prop) => {
+["_bubbleSort","_getSteps","_getStepArray","_malloc","_free","_memory","___indirect_function_table","onRuntimeInitialized"].forEach((prop) => {
   if (!Object.getOwnPropertyDescriptor(readyPromise, prop)) {
     Object.defineProperty(readyPromise, prop, {
       get: () => abort('You are getting ' + prop + ' on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js'),
@@ -895,6 +895,8 @@ function dbg(...args) {
       }
     };
 
+  var __emscripten_memcpy_js = (dest, src, num) => HEAPU8.copyWithin(dest, src, src + num);
+
   var getHeapMax = () =>
       // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
       // full 4GB Wasm memories, the size will wrap back to 0 bytes in Wasm side
@@ -1203,14 +1205,16 @@ function checkIncomingModuleAPI() {
 }
 var wasmImports = {
   /** @export */
+  _emscripten_memcpy_js: __emscripten_memcpy_js,
+  /** @export */
   emscripten_resize_heap: _emscripten_resize_heap
 };
 var wasmExports;
 createWasm();
 var ___wasm_call_ctors = createExportWrapper('__wasm_call_ctors', 0);
-var _setCallback = Module['_setCallback'] = createExportWrapper('setCallback', 1);
+var _getSteps = Module['_getSteps'] = createExportWrapper('getSteps', 0);
+var _getStepArray = Module['_getStepArray'] = createExportWrapper('getStepArray', 2);
 var _bubbleSort = Module['_bubbleSort'] = createExportWrapper('bubbleSort', 2);
-var _testFunction = Module['_testFunction'] = createExportWrapper('testFunction', 0);
 var _fflush = createExportWrapper('fflush', 1);
 var _malloc = Module['_malloc'] = createExportWrapper('malloc', 1);
 var _free = Module['_free'] = createExportWrapper('free', 1);
