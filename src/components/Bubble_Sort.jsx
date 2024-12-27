@@ -27,12 +27,10 @@ export default function BubbleSortComponent() {
         setSortedArray(sorted);
     };
 
-    if (loading) return <div>Loading WASM module...</div>;
-    if (error) return <div>Error loading WASM module: {error.message}</div>;
-
     return (
         <div>
             <h1>Bubble Sort</h1>
+            <div>Array: {array.join(', ')}</div>
             <button onClick={handleSorting}>Sort Array</button>
             <div>Sorted Array: {sortedArray.join(', ')}</div>
         </div>
