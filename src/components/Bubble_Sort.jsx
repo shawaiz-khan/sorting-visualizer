@@ -16,23 +16,29 @@ export default function BubbleSortComponent() {
         const wasmMemory = new Int32Array(wasmModule.memory.buffer);
         const arraySize = array.length;
 
+        // Allocate memory in WebAssembly for the array
         const arrayPtr = wasmModule.malloc(arraySize * 4);
 
+        // Copy the input array from JavaScript to the allocated memory
         for (let i = 0; i < arraySize; i++) {
             wasmMemory[arrayPtr / 4 + i] = array[i];
         }
 
+        // Call the bubble sort function in WebAssembly
         wasmModule.bubbleSort(arrayPtr, arraySize);
 
+        // Get the total number of steps taken during the sort process
         const totalSteps = wasmModule.getSteps();
         setSteps(totalSteps);
 
+        // Create a new array to store the sorted values at the current step
         const stepArray = [];
         for (let i = 0; i < arraySize; i++) {
             stepArray.push(wasmMemory[arrayPtr / 4 + i]);
         }
         setCurrentStepArray(stepArray);
 
+        // Free the allocated memory for the array after use
         wasmModule.free(arrayPtr);
         setCurrentStep(0);
         setHighlightIndices([]);
@@ -44,17 +50,21 @@ export default function BubbleSortComponent() {
         const wasmMemory = new Int32Array(wasmModule.memory.buffer);
         const arraySize = array.length;
 
+        // Allocate memory for the step array and swapped indices
         const stepArrayPtr = wasmModule.malloc(arraySize * 4);
         const swapIndicesPtr = wasmModule.malloc(8);
 
+        // Retrieve the step array and swapped indices for the given step
         wasmModule.getStepArray(stepArrayPtr, stepIndex);
         wasmModule.getStepSwappedIndices(swapIndicesPtr, stepIndex);
 
+        // Create a new array to hold the data at the specific step
         const stepArray = [];
         for (let i = 0; i < arraySize; i++) {
             stepArray.push(wasmMemory[stepArrayPtr / 4 + i]);
         }
 
+        // Retrieve the swapped indices for the step
         const swapIndices = [
             wasmMemory[swapIndicesPtr / 4],
             wasmMemory[swapIndicesPtr / 4 + 1],
@@ -64,6 +74,7 @@ export default function BubbleSortComponent() {
         setHighlightIndices(swapIndices[0] !== -1 ? swapIndices : []);
         setCurrentStep(stepIndex);
 
+        // Free the allocated memory for the step array and swap indices
         wasmModule.free(stepArrayPtr);
         wasmModule.free(swapIndicesPtr);
     };
