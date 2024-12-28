@@ -28,7 +28,7 @@ var readyPromise = new Promise((resolve, reject) => {
   readyPromiseResolve = resolve;
   readyPromiseReject = reject;
 });
-["_bubbleSort","_getSteps","_getStepArray","_malloc","_free","_memory","___indirect_function_table","onRuntimeInitialized"].forEach((prop) => {
+["_bubbleSort","_getSteps","_getStepArray","_getStepSwappedIndices","_malloc","_free","_memory","___indirect_function_table","onRuntimeInitialized"].forEach((prop) => {
   if (!Object.getOwnPropertyDescriptor(readyPromise, prop)) {
     Object.defineProperty(readyPromise, prop, {
       get: () => abort('You are getting ' + prop + ' on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js'),
@@ -1214,6 +1214,7 @@ createWasm();
 var ___wasm_call_ctors = createExportWrapper('__wasm_call_ctors', 0);
 var _getSteps = Module['_getSteps'] = createExportWrapper('getSteps', 0);
 var _getStepArray = Module['_getStepArray'] = createExportWrapper('getStepArray', 2);
+var _getStepSwappedIndices = Module['_getStepSwappedIndices'] = createExportWrapper('getStepSwappedIndices', 2);
 var _bubbleSort = Module['_bubbleSort'] = createExportWrapper('bubbleSort', 2);
 var _fflush = createExportWrapper('fflush', 1);
 var _malloc = Module['_malloc'] = createExportWrapper('malloc', 1);
