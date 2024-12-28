@@ -4,7 +4,7 @@ import useWasm from '../hooks/useWasm';
 
 export default function BubbleSortComponent() {
     const { wasmModule, loading, error } = useWasm();
-    const [array, setArray] = useState([15, 3, 42, 7, 27, 19, 8, 31, 4, 22]);
+    const array = [15, 3, 42, 7, 27, 19, 8, 31, 4, 22];
     const [currentStepArray, setCurrentStepArray] = useState([]);
     const [steps, setSteps] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
@@ -12,6 +12,8 @@ export default function BubbleSortComponent() {
 
     const handleSorting = () => {
         if (!wasmModule) return;
+
+        console.log("Starting Sorting...");
 
         const wasmMemory = new Int32Array(wasmModule.memory.buffer);
         const arraySize = array.length;
@@ -30,21 +32,27 @@ export default function BubbleSortComponent() {
         // Get the total number of steps taken during the sort process
         const totalSteps = wasmModule.getSteps();
         setSteps(totalSteps);
+        console.log(`Total steps for sorting: ${totalSteps}`);
 
         // Create a new array to store the sorted values at the current step
         const stepArray = [];
         for (let i = 0; i < arraySize; i++) {
             stepArray.push(wasmMemory[arrayPtr / 4 + i]);
         }
+
         setCurrentStepArray(stepArray);
 
         // Free the allocated memory for the array after use
         wasmModule.free(arrayPtr);
         setCurrentStep(0);
         setHighlightIndices([]);
+
+        console.log('Sorting completed. Sorted array:', stepArray);
     };
 
     const handleStepChange = (stepIndex) => {
+        console.log(`Changing to step: ${stepIndex}`);
+
         if (!wasmModule || stepIndex < 0 || stepIndex >= steps) return;
 
         const wasmMemory = new Int32Array(wasmModule.memory.buffer);
@@ -62,6 +70,7 @@ export default function BubbleSortComponent() {
         const stepArray = [];
         for (let i = 0; i < arraySize; i++) {
             stepArray.push(wasmMemory[stepArrayPtr / 4 + i]);
+            console.log("Step Array: ", stepArray);
         }
 
         // Retrieve the swapped indices for the step
@@ -69,6 +78,9 @@ export default function BubbleSortComponent() {
             wasmMemory[swapIndicesPtr / 4],
             wasmMemory[swapIndicesPtr / 4 + 1],
         ];
+
+        console.log(`Step ${stepIndex}:`, stepArray);
+        console.log(`Highlighting indices:`, swapIndices);
 
         setCurrentStepArray(stepArray);
         setHighlightIndices(swapIndices[0] !== -1 ? swapIndices : []);
@@ -117,7 +129,7 @@ export default function BubbleSortComponent() {
                         Next Step
                     </button>
                 </div>
-                <strong className="text-gray-700">Current Step ({currentStep + 1}):</strong>
+                <strong className="text-gray-700">Current Step ({currentStep}):</strong>
                 <div className="flex justify-center gap-3 mt-5">
                     {currentStepArray.length > 0
                         ? currentStepArray.map((item, index) => (
@@ -136,7 +148,8 @@ export default function BubbleSortComponent() {
                                 {item}
                             </motion.div>
                         ))
-                        : <p className="text-gray-500">N/A</p>}
+                        : <p className="text-gray-500">N/A</p>
+                    }
                 </div>
             </div>
         </div>
