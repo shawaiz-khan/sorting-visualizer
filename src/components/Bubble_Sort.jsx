@@ -13,8 +13,6 @@ export default function BubbleSortComponent() {
     const handleSorting = () => {
         if (!wasmModule) return;
 
-        console.log("Starting Sorting...");
-
         const wasmMemory = new Int32Array(wasmModule.memory.buffer);
         const arraySize = array.length;
 
@@ -26,15 +24,11 @@ export default function BubbleSortComponent() {
             wasmMemory[arrayPtr / 4 + i] = array[i];
         }
 
-        // Call the bubble sort function in WebAssembly
         wasmModule.bubbleSort(arrayPtr, arraySize);
 
-        // Get the total number of steps taken during the sort process
         const totalSteps = wasmModule.getSteps();
         setSteps(totalSteps);
-        console.log(`Total steps for sorting: ${totalSteps}`);
 
-        // Create a new array to store the sorted values at the current step
         const stepArray = [];
         for (let i = 0; i < arraySize; i++) {
             stepArray.push(wasmMemory[arrayPtr / 4 + i]);
@@ -46,13 +40,9 @@ export default function BubbleSortComponent() {
         wasmModule.free(arrayPtr);
         setCurrentStep(0);
         setHighlightIndices([]);
-
-        console.log('Sorting completed. Sorted array:', stepArray);
     };
 
     const handleStepChange = (stepIndex) => {
-        console.log(`Changing to step: ${stepIndex}`);
-
         if (!wasmModule || stepIndex < 0 || stepIndex >= steps) return;
 
         const wasmMemory = new Int32Array(wasmModule.memory.buffer);
@@ -66,21 +56,16 @@ export default function BubbleSortComponent() {
         wasmModule.getStepArray(stepArrayPtr, stepIndex);
         wasmModule.getStepSwappedIndices(swapIndicesPtr, stepIndex);
 
-        // Create a new array to hold the data at the specific step
         const stepArray = [];
         for (let i = 0; i < arraySize; i++) {
             stepArray.push(wasmMemory[stepArrayPtr / 4 + i]);
             console.log("Step Array: ", stepArray);
         }
 
-        // Retrieve the swapped indices for the step
         const swapIndices = [
             wasmMemory[swapIndicesPtr / 4],
             wasmMemory[swapIndicesPtr / 4 + 1],
         ];
-
-        console.log(`Step ${stepIndex}:`, stepArray);
-        console.log(`Highlighting indices:`, swapIndices);
 
         setCurrentStepArray(stepArray);
         setHighlightIndices(swapIndices[0] !== -1 ? swapIndices : []);

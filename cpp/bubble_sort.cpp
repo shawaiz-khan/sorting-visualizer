@@ -4,14 +4,14 @@
 
 extern "C" {
     // Global Variables
-    int steps = 0; // Keeps track of the number of steps during the sorting process
-    const int MAX_STEPS = 100; // Maximum number of steps allowed
-    const int MAX_SIZE = 100; // Maximum array size allowed
+    int steps = 0;
+    const int MAX_STEPS = 100;
+    const int MAX_SIZE = 100;
 
     // Global Arrays
-    int sortSteps[MAX_STEPS][MAX_SIZE]; // Stores the array at each step of sorting
-    int sizes[MAX_STEPS]; // Stores the size of the array at each step
-    int swappedIndices[MAX_STEPS][2]; // Stores the indices of swapped elements at each step
+    int sortSteps[MAX_STEPS][MAX_SIZE];
+    int sizes[MAX_STEPS];
+    int swappedIndices[MAX_STEPS][2];
 
     /* Swap Function   
         Swaps two integer values passed by reference. 
@@ -75,7 +75,6 @@ extern "C" {
         swappedIndices[steps][1] = -1;
         steps++;
 
-        // Perform bubble sort
         for (int i = 0; i < size - 1; ++i) {
             for (int j = 0; j < size - i - 1; ++j) {
                 if (arr[j] > arr[j + 1]) {
@@ -89,7 +88,6 @@ extern "C" {
                     swappedIndices[steps][1] = j + 1;
                     steps++;
 
-                    // Break if the maximum number of steps is exceeded
                     if (steps >= MAX_STEPS) {
                         break;
                     }
