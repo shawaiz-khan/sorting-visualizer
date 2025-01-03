@@ -38,6 +38,9 @@ export default function useWasm() {
                 },
             });
 
+            // Check the Result
+            console.log(res.instance.exports);
+
             // Set the WASM module instance, which gives access to all the exports from the WASM file
             setWasmModule(res.instance.exports);
         } catch (err) {
